@@ -4,34 +4,47 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({ request })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-  // Refrescar la sesión (no bloquear la request)
-  const { data: { user } } = await supabase.auth.getUser()
+  // Si faltan las variables, no hacemos nada (esto evitará el MIDDLEWARE_INVOCATION_FAILED)
+  // Pero permitimos que la request continúe para que el resto de la app maneje el error o muestre el login
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return supabaseResponse
+  }
 
-  // Proteger rutas admin
-  if (request.nextUrl.pathname.startsWith('/admin')) {
-    if (!user) {
-      return NextResponse.redirect(new URL('/', request.url))
+  try {
+    const supabase = createServerClient(
+      supabaseUrl,
+      supabaseAnonKey,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+            supabaseResponse = NextResponse.next({ request })
+            cookiesToSet.forEach(({ name, value, options }) =>
+              supabaseResponse.cookies.set(name, value, options)
+            )
+          },
+        },
+      }
+    )
+
+    // Solo refrescamos si no es una ruta estática (el matcher ya debería filtrar esto)
+    const { data: { user } } = await supabase.auth.getUser()
+
+    // Proteger rutas admin
+    if (request.nextUrl.pathname.startsWith('/admin')) {
+      if (!user) {
+        return NextResponse.redirect(new URL('/', request.url))
+      }
     }
-    // La validación de is_admin se hace en la page.tsx (server component)
+  } catch (error) {
+    // Si hay un error con Supabase en el middleware, no bloqueamos la app completa
+    console.error('Middleware error:', error)
   }
 
   return supabaseResponse
