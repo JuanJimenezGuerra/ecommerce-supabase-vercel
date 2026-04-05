@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# junk and generated
+1775339621763/
+*.mp4
+ts-error.txt
+.gemini/
+.antigravity/
