@@ -24,7 +24,6 @@ const COLOMBIA_DEPARTMENTS = [
 export default function CheckoutPage() {
   const router = useRouter()
   const { items, clearCart } = useCart()
-  const totalPrice = useCart(state => state.items.reduce((acc, item) => acc + item.price * item.quantity, 0))
   const [mounted, setMounted] = React.useState(false)
   const [isProcessing, setIsProcessing] = React.useState(false)
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null)
@@ -46,7 +45,16 @@ export default function CheckoutPage() {
     }
   }, [mounted, items.length, router])
 
-  if (!mounted || items.length === 0) return null
+  // Improved hydration guard: show loading UI instead of null
+  if (!mounted) {
+    return <CheckoutLoading />
+  }
+
+  // If no items after mounting, we're already redirecting
+  if (items.length === 0) return <CheckoutLoading />
+
+  // Safe to calculate total now
+  const totalPrice = items.reduce((acc, item) => acc + item.price * item.quantity, 0)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -285,6 +293,16 @@ export default function CheckoutPage() {
 
         </div>
       </div>
+    </div>
+  )
+}
+
+function CheckoutLoading() {
+  return (
+    <div className="min-h-screen bg-cream flex flex-col items-center justify-center p-6 text-center">
+      <div className="w-16 h-16 border-4 border-sage border-t-transparent rounded-full animate-spin mb-6" />
+      <h2 className="font-serif text-2xl font-bold text-pine mb-2">Preparando tu compra</h2>
+      <p className="text-bark-light">Estamos asegurando tu conexión para un pago confiable...</p>
     </div>
   )
 }
