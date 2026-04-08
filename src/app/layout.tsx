@@ -17,7 +17,7 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: "La Abuela Savia | La Ciencia de lo Natural",
-  description: "Descubre la crema rejuvenecedora de la Abuela Savia. Fusión entre botánica y biotecnología para tu piel.",
+  description: "Descubre la crema regeneradora de la Abuela Savia. Fusión entre botánica y biotecnología para tu piel.",
 };
 
 export default function RootLayout({
