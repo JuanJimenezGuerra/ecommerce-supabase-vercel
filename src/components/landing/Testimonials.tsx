@@ -28,7 +28,7 @@ export function Testimonials() {
       <div className="container mx-auto px-6 md:px-12">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="font-serif text-3xl md:text-5xl font-bold text-pine mb-6">
-            Más de <span className="text-gold">1,500</span> Mujeres
+            Más de <span className="text-gold">1,500</span> personas
           </h2>
           <p className="text-bark-light text-lg">
             Han transformado su piel y recuperado la confianza. Ellas ya experimentaron la ciencia botánica.
