@@ -31,7 +31,7 @@ export function FAQ() {
             Preguntas Frecuentes
           </h2>
           <p className="text-bark-light text-lg max-w-xl mx-auto">
-            Resolvemos tus dudas para que des el paso hacia una piel rejuvenecida con total confianza.
+            Resolvemos tus dudas para que des el paso hacia una piel regenerada con total confianza.
           </p>
         </div>
 
